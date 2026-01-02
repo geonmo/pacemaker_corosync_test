@@ -1,0 +1,9 @@
+---
+- name: VirtualBMC 셋업
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+
+
+

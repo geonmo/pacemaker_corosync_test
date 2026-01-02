@@ -1,6 +1,0 @@
-[bmc]
-kvm-host
-[vm]
-node1
-node2
-

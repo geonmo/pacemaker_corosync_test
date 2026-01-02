@@ -1,0 +1,48 @@
+---
+- name: Install and configure pacemake and corosync
+  hosts: all
+  become: yes
+  tasks:
+    - name: 저장소 관련 패키지 설치
+      dnf:
+        name: epel-release
+        state: latest
+    - name: crb 저장소 사용
+      shell: "sudo dnf config-manager --set-enabled crb"
+    - name: ha 저장소 사용
+      shell: "sudo dnf config-manager --set-enabled highavailability"
+    - name: 패키지 설치
+      dnf:
+        name: "{{ item }}"
+      with_items:
+        - pacemaker
+        - corosync
+        - pcs
+        - fence-agents-all
+    - name: 서비스 셋업
+      service:
+        name: pcsd
+        state: started
+        enabled: yes
+    - name: hacluster 계정 생성
+      user:
+        name: hacluster
+        comment: "pacemaker user"
+        shell: /bin/bash
+        home: /var/lib/hacluster
+        uid: 189
+        password: "$6$GGy/xCYIXnc9ssM6$OPb6jpcqMHldqKv0nPaxieQJoJ1cHLidHyUzHgMFrj4vKnPEyLvuwTJvUlclvKm7dke1FTbNrcC7/zuaPty4v0"
+        group: haclient
+    - name: hacluster 계정 ssh 디렉토리 확인
+      file:
+        path: /var/lib/hacluster/.ssh
+        state: directory
+        owner: hacluster
+        group: haclient
+        mode: "0700"
+    - name: public key 배포
+      authorized_key:
+        user: hacluster
+        key: "{{ lookup('file', lookup('env','HOME')+'/.ssh/authorized_keys') }}"
+        state: present
+

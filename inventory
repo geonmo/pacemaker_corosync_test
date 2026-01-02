@@ -1,0 +1,6 @@
+[bmc]
+alma.pacemaker.test
+[vm]
+node1.pacemaker.test
+node2.pacemaker.test
+
