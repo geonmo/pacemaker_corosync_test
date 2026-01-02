@@ -1,4 +1,7 @@
 #!/bin/bash
+sudo dnf install -y epel-release
+sudo dnf config-manager --set-enabled crb
+
 sudo dnf -y install qemu-kvm libvirt virt-install libvirt-client virt-manager \
   bridge-utils cockpit-machines \
   python3-pip iproute-tc xorriso
@@ -156,4 +159,8 @@ sudo virt-install \
   --graphics none \
   --console pty,target_type=serial
 
+## ansible setup
+sudo dnf install -y ansible ansible-collection-community-general  ansible-collection-community-libvirt ansible-collection-containers-podman
 
+gh auth login 
+gh repo clone geonmo/pacemaker_corosync_test
