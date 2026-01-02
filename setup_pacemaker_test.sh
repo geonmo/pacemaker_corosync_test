@@ -162,5 +162,3 @@ sudo virt-install \
 ## ansible setup
 sudo dnf install -y ansible ansible-collection-community-general  ansible-collection-community-libvirt ansible-collection-containers-podman
 
-gh auth login 
-gh repo clone geonmo/pacemaker_corosync_test
