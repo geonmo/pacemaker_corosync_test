@@ -1,0 +1,16 @@
+---
+- name: auth pcs
+  hosts: node1
+  become: yes
+  tasks:
+    - name: auth
+      shell: "pcs host auth node1 node2 -u hacluster -p clouduser"
+    - name: cluster 생성
+      shell: "pcs cluster setup demo-cluster node1 node2"
+    - name: cluster 실행 및 자동 실행
+      shell: "pcs cluster start --all && pcs cluster enable --all"
+    - name: pcs 속성 정의
+      shell: |
+        pcs property set no-quorum-policy=ignore
+        pcs property set stonith-enabled=true
+

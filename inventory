@@ -1,6 +1,6 @@
 [bmc]
-alma.pacemaker.test
+kvm-host
 [vm]
-node1.pacemaker.test
-node2.pacemaker.test
+node1
+node2
 

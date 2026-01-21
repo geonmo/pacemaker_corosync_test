@@ -162,3 +162,29 @@ sudo virt-install \
 ## ansible setup
 sudo dnf install -y ansible ansible-collection-community-general  ansible-collection-community-libvirt ansible-collection-containers-podman
 
+sudo virsh shutdown node1
+sleep 5
+sudo virsh attach-interface node1 \
+  --type bridge --source br0 --model virtio --config
+sudo virsh start node1
+
+sudo virsh shutdown node2
+sleep 5
+sudo virsh attach-interface node2 \
+  --type bridge --source br0 --model virtio --config
+sudo virsh start node2
+
+
+sudo tee $HOME/.ssh/config >/dev/null <<EOF
+Host node1
+        hostname 192.168.200.11
+        User clouduser
+Host node2
+        hostname 192.168.200.12
+        User clouduser
+Host node-vip
+        hostname 192.168.200.100
+        User clouduser
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+EOF

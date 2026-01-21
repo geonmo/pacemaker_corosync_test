@@ -31,7 +31,7 @@
         shell: /bin/bash
         home: /var/lib/hacluster
         uid: 189
-        password: "$6$GGy/xCYIXnc9ssM6$OPb6jpcqMHldqKv0nPaxieQJoJ1cHLidHyUzHgMFrj4vKnPEyLvuwTJvUlclvKm7dke1FTbNrcC7/zuaPty4v0"
+        password: "$6$GGy/xCYIXnc9ssM6$OPb6jpcqMHldqKv0nPaxieQJoJ1cHLidHyUzHgMFrj4vKnPEyLvuwTJvUlclvKm7dke1FTbNrcC7/zuaPty4v0"  ## PW: clouduser
         group: haclient
     - name: hacluster 계정 ssh 디렉토리 확인
       file:
@@ -45,4 +45,12 @@
         user: hacluster
         key: "{{ lookup('file', lookup('env','HOME')+'/.ssh/authorized_keys') }}"
         state: present
+    - name: /etc/hosts에 br0 로 통신되는 IP 주소 등록
+      blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} ANSIBLE MANAGED PACEMAKER CLUSTER HOSTS"
+        block: |
+          192.168.200.10  kvm-host
+          192.168.200.11  node1
+          192.168.200.12  node2
 

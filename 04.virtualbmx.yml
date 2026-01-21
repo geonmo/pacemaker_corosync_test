@@ -1,0 +1,73 @@
+---
+- name: VirtualBMC 셋업
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: PATH 환경변수에 /usr/local/bin 추가
+      copy:   
+        dest: /etc/profile.d/50-path-append.sh
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          # Added by Ansible
+          case ":$PATH:" in
+            *:/usr/local/bin:*) ;;
+            *) export PATH="/usr/local/bin:$PATH" ;;
+          esac
+    - name: Ensure python3-pip
+      package:
+        name: python3-pip
+        state: present
+    - name: Install virtualbmc using pip3
+      pip:
+        name: virtualbmc
+        executable: pip3 
+    - name: virtualbmc용 systemd service 추가
+      copy:
+        dest: /etc/systemd/system/vbmcd.service
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=VirtualBMC control daemon (vbmcd)
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=root
+          ExecStart=/usr/local/bin/vbmcd --foreground
+          Restart=always
+          RestartSec=2
+
+          [Install]
+          WantedBy=multi-user.target
+    - name: daemon 리로딩
+      shell: systemctl daemon-reload
+    - name: vbmcd 서비스 시작 및 부팅시 시작 활성화
+      service:
+        name: vbmcd.service
+        state: started
+        enabled: yes
+    - name: 방화벽 관련 패키지 설치 여부 확인
+      package_facts: 
+        manager: auto
+    - name: 방화벽 서비스 활성화 여부
+      service_facts:
+    - name: 방화벽 설정 
+      firewalld:
+        port: 6230-6231/udp
+        permanent: true
+        state: enabled
+        immediate: true
+        zone: libvirt
+      when:
+        - "'firewalld' in ansible_facts.packages"
+        - ansible_facts.services['firewalld.service'].state == 'running'
+
+
+
+
+
